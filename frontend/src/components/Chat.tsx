@@ -1,22 +1,8 @@
 import React from 'react'
 import ReactMarkdown from 'react-markdown'
-
-interface ChatProps {
-	messages?: Array<{
-		role: 'user' | 'assistant'
-		content: string
-	}>
-}
+import type { ChatProps } from '../types'
 
 export const Chat: React.FC<ChatProps> = ({ messages = [] }) => {
-	// Temporary dummy data for display if no messages are passed
-	// const dummyMessages = [
-	// 	{ role: 'user', content: 'How do I say "Good morning" in German?' },
-	// 	{ role: 'assistant', content: "Hello! Type your text below, and I'll help you translate or correct it." },
-	// 	{ role: 'user', content: 'Can you check this sentence for me?' },
-	// 	{ role: 'assistant', content: "Sure, please enter your sentence and I'll correct any mistakes." }
-	// ]
-
 	if ( ! messages.length ) {
 	return (
 		<div className="hero-message">

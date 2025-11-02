@@ -1,16 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-
-interface DropdownOption {
-  value: string
-  label: string
-}
-
-interface DropdownProps {
-  label: string
-  value: string
-  options: DropdownOption[]
-  onChange: (value: string) => void
-}
+import type { DropdownProps } from '../types'
 
 function Dropdown({ label, value, options, onChange }: DropdownProps) {
   const [isOpen, setIsOpen] = useState(false)
