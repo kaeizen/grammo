@@ -21,7 +21,7 @@ function App() {
 	const [ showOptions, setShowOptions ] = useState(false);
 	const [ messageToSend, setMessageToSend ] = useState("");
 	const [ hasActiveSession, setHasActiveSession ] = useState(false);
-	const [ chatSession, setChatSession ] = useState(0);
+	const [ chatSession, setChatSession ] = useState(1);
 
 	const [messages, setMessages] = useState<Message[]>([]);
 	const [isRetrieving, setIsRetrieving] = useState(false);
