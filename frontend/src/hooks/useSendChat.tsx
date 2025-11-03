@@ -82,8 +82,8 @@ export const useSendChat = (
 
 					setMessages((prev) => [...prev, assistantMessage]);
 					setError(null);
-					if ( chatSession === -1 ) {
-						setChatSession(0);
+					if ( chatSession !== 1 ) {
+						setChatSession(1);
 					}
 				} else {
 					// Invalid response format - use generic error

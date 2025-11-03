@@ -65,7 +65,7 @@ function App() {
 		});
 		setHasActiveSession(false);
 		setMessages([]);
-		setChatSession(-1);
+		setChatSession(0);
 	}
 
 	return (
