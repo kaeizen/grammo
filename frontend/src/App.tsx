@@ -33,7 +33,7 @@ function App() {
 	useEndChat(hasActiveSession);
 	const error = useSendChat(isRetrieving, chatSession,
 		mode, tone, messageToSend, setMessageToSend,
-		setMessages, setIsRetrieving
+		setMessages, setIsRetrieving, setChatSession
 	);
 
 	const handleToggleOptions = () => {
@@ -65,7 +65,7 @@ function App() {
 		});
 		setHasActiveSession(false);
 		setMessages([]);
-		setChatSession(prev => prev + 1);
+		setChatSession(-1);
 	}
 
 	return (

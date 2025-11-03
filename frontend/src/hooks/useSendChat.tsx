@@ -15,7 +15,8 @@ export const useSendChat = (
 	messageToSend: string,
 	setMessageToSend: (value: string) => void,
 	setMessages: React.Dispatch<React.SetStateAction<Message[]>>,
-	setIsRetrieving: (value: boolean) => void
+	setIsRetrieving: (value: boolean) => void,
+	setChatSession: (value: number) => void,
 ): ErrorState | null => {
 	const [error, setError] = useState<ErrorState | null>(null);
 	const abortControllerRef = useRef<AbortController | null>(null);
@@ -81,6 +82,9 @@ export const useSendChat = (
 
 					setMessages((prev) => [...prev, assistantMessage]);
 					setError(null);
+					if ( chatSession === -1 ) {
+						setChatSession(0);
+					}
 				} else {
 					// Invalid response format - use generic error
 					throw new Error("INVALID_RESPONSE");
