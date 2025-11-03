@@ -55,6 +55,7 @@ export const useSendChat = (
 			headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 message: messageContent,
+				chatSession,
                 mode,
                 tone,
             }),
