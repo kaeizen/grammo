@@ -1,8 +1,7 @@
 
 import type { Message } from "./types";
 import { useState, useRef, type FormEvent } from "react";
-import { useLocalStorage, useEndChat,
-	useFormHeight, useSendChat } from "./hooks";
+import { useLocalStorage, useFormHeight, useSendChat } from "./hooks";
 import { API_ENDPOINT } from "./utils";
 
 import Cog from "./assets/cog.svg";
@@ -15,13 +14,12 @@ import { Tooltip } from "./components/Tooltip";
 
 
 function App() {
-	const [ mode, setMode ] = useLocalStorage('gm_mode', 'Default')
-	const [ tone, setTone ] = useLocalStorage( 'gm_tone', 'Default')
+	const [ mode, setMode ] = useLocalStorage('gm_mode', 'default')
+	const [ tone, setTone ] = useLocalStorage( 'gm_tone', 'default')
 
 	const [ showOptions, setShowOptions ] = useState(false);
 	const [ messageToSend, setMessageToSend ] = useState("");
 	const [ hasActiveSession, setHasActiveSession ] = useState(false);
-	const [ chatSession, setChatSession ] = useState(1);
 
 	const [messages, setMessages] = useState<Message[]>([]);
 	const [isRetrieving, setIsRetrieving] = useState(false);
@@ -30,10 +28,9 @@ function App() {
 	const optionsRef = useRef<HTMLDivElement>(null);
 
 	useFormHeight(formRef, optionsRef, showOptions);
-	useEndChat(hasActiveSession);
-	const error = useSendChat(isRetrieving, chatSession,
+	const error = useSendChat(isRetrieving, hasActiveSession,
 		mode, tone, messageToSend, setMessageToSend,
-		setMessages, setIsRetrieving, setChatSession
+		setMessages, setIsRetrieving, setHasActiveSession
 	);
 
 	const handleToggleOptions = () => {
@@ -46,10 +43,6 @@ function App() {
 
 		if ( showOptions ) {
 			setShowOptions(false);
-		}
-
-		if ( ! hasActiveSession ) {
-			setHasActiveSession(true);
 		}
 	};
 
@@ -65,7 +58,6 @@ function App() {
 		});
 		setHasActiveSession(false);
 		setMessages([]);
-		setChatSession(0);
 	}
 
 	return (

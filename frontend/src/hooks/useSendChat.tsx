@@ -9,22 +9,17 @@ interface ErrorState {
 
 export const useSendChat = (
 	isRetrieving: boolean,
-	chatSession: number,
+	hasActiveSession: boolean,
 	mode: string,
 	tone: string,
 	messageToSend: string,
 	setMessageToSend: (value: string) => void,
 	setMessages: React.Dispatch<React.SetStateAction<Message[]>>,
 	setIsRetrieving: (value: boolean) => void,
-	setChatSession: (value: number) => void,
+	setHasActiveSession: (value: boolean) => void,
 ): ErrorState | null => {
 	const [error, setError] = useState<ErrorState | null>(null);
 	const abortControllerRef = useRef<AbortController | null>(null);
-
-	// Clear error when chat session changes (e.g., on reset)
-	useEffect(() => {
-		setError(null);
-	}, [chatSession]);
 
 	useEffect(() => {
 		// Only proceed if we're retrieving and there's a message to send
@@ -56,7 +51,7 @@ export const useSendChat = (
 			headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 message: messageContent,
-				chatSession,
+				chat_session: hasActiveSession ? 1 : 0,
                 mode,
                 tone,
             }),
@@ -82,8 +77,8 @@ export const useSendChat = (
 
 					setMessages((prev) => [...prev, assistantMessage]);
 					setError(null);
-					if ( chatSession !== 1 ) {
-						setChatSession(1);
+					if ( ! hasActiveSession ) {
+						setHasActiveSession(true);
 					}
 				} else {
 					// Invalid response format - use generic error
