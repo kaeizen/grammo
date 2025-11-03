@@ -42,6 +42,10 @@ function App() {
 		e.preventDefault();
 		setIsRetrieving(true);
 
+		if ( showOptions ) {
+			setShowOptions(false);
+		}
+
 		if ( ! hasActiveSession ) {
 			setHasActiveSession(true);
 		}
