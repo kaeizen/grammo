@@ -53,12 +53,11 @@ export const useSendChat = (
 			method: "POST",
 			credentials: "include",
 			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({
-				message: messageContent,
-				chatSession: chatSession,
-				mode,
-				tone,
-			}),
+            body: JSON.stringify({
+                message: messageContent,
+                mode,
+                tone,
+            }),
 			signal: abortController.signal,
 		})
 			.then(async (response) => {

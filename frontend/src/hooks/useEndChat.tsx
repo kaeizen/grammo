@@ -29,8 +29,8 @@ const isPWAInstalled = (): boolean => {
 const endChat = () => {
 	// Use sendBeacon for guaranteed sending before unload
 	if (navigator.sendBeacon) {
-		const url = `${API_ENDPOINT}/api/v1/end/`;
-		const data = JSON.stringify({});
+        const url = `${API_ENDPOINT}/api/v1/end/`;
+        const data = JSON.stringify({});
 		navigator.sendBeacon(url, data);
 	} else {
 		// Fallback to fetch (not guaranteed)
@@ -38,7 +38,7 @@ const endChat = () => {
 			method: "POST",
 			credentials: "include",
 			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({}),
+            body: JSON.stringify({}),
 	}).catch(() => {
 		// Silently handle errors - end chat is a cleanup operation
 		// Don't log error details to avoid exposing sensitive information
@@ -57,15 +57,15 @@ export const useEndChat = (hasActiveSession: boolean) => {
 
 		// PWA Mode: Use pagehide for actual app close
 		// visibilitychange is tracked but doesn't trigger endChat (preserves state when backgrounded)
-		const handlePageHide = (e: PageTransitionEvent) => {
+        const handlePageHide = (e: PageTransitionEvent) => {
 			// Check if page is being unloaded (not just hidden)
 			if (e.persisted === false) {
-				endChat();
+                endChat();
 			}
 		};
 
 		// Browser Mode: Use beforeunload (existing behavior)
-		const handleWindowUnload = () => endChat();
+        const handleWindowUnload = () => endChat();
 
 		if (isPWA) {
 			window.addEventListener("pagehide", handlePageHide);
@@ -79,5 +79,5 @@ export const useEndChat = (hasActiveSession: boolean) => {
 				window.removeEventListener("beforeunload", handleWindowUnload);
 			}
 		};
-	}, [ hasActiveSession ]);
+    }, [ hasActiveSession ]);
 };
