@@ -11,19 +11,19 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements file
-COPY requirements.txt .
+COPY backend/requirements.txt .
 
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the entire backend directory
-COPY . .
+COPY backend/ backend/
 
 # Collect static files (if needed)
-RUN python manage.py collectstatic --noinput || true
+RUN cd backend && python manage.py collectstatic --noinput || true
 
 # Run database migrations
-RUN python manage.py migrate --noinput || true
+RUN cd backend && python manage.py migrate --noinput || true
 
 # Expose port 7860 (Hugging Face Spaces default port)
 EXPOSE 7860
