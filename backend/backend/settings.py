@@ -28,23 +28,44 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ["SECRET_KEY"]
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get("DEBUG", "True") == "True"
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    origin.strip()
+    for origin in os.environ.get("ALLOWED_HOSTS", "").split(",")
+    if origin.strip()
+] if os.environ.get("ALLOWED_HOSTS") else []
 
 CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOW_ALL_ORIGINS = True #TODO
-# CORS_ALLOWED_ORIGINS = [
-#     "http://localhost:3000",  # your React dev URL
-# ]
+CORS_ALLOW_ALL_ORIGINS = [os.environ.get("CORS_ALLOW_ALL_ORIGINS", "").strip()] if os.environ.get("CORS_ALLOW_ALL_ORIGINS") is not None else True
+
 
 SESSION_COOKIE_HTTPONLY = True
-SESSION_COOKIE_SECURE = False        # use False only for local dev (no HTTPS)
+SESSION_COOKIE_SECURE = os.environ.get("SESSION_COOKIE_SECURE", "False") == "True" # use False only for local dev (no HTTPS)
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 SESSION_COOKIE_AGE = 60 * 60 * 24  # 1 day
 
 CSRF_COOKIE_HTTPONLY = True
-# CSRF_TRUSTED_ORIGINS = ["http://localhost:3000"]
+CSRF_COOKIE_SECURE = os.environ.get("CSRF_COOKIE_SECURE", "False") == "True"
+CSRF_TRUSTED_ORIGINS = [
+    origin.strip()
+    for origin in os.environ.get("CSRF_TRUSTED_ORIGINS", "").split(",")
+    if origin.strip()
+]
+
+SECURE_SSL_REDIRECT = os.environ.get("SECURE_SSL_REDIRECT", "False") == "True"
+
+SECURE_CONTENT_TYPE_NOSNIFF = os.environ.get("SECURE_CONTENT_TYPE_NOSNIFF", "False") == "True"
+
+# HSTS settings - only enable in production with proper HTTPS configuration
+# WARNING: Once enabled, browsers will remember this for SECURE_HSTS_SECONDS seconds
+# Only enable after ensuring HTTPS works correctly for all domains
+# Set to 0 to disable HSTS (default for development), or set a positive value (e.g., 31536000 for 1 year) for production
+SECURE_HSTS_SECONDS = int(os.environ.get("SECURE_HSTS_SECONDS", "0"))
+if SECURE_HSTS_SECONDS > 0:
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = os.environ.get("SECURE_HSTS_INCLUDE_SUBDOMAINS", "False") == "True"
+    SECURE_HSTS_PRELOAD = os.environ.get("SECURE_HSTS_PRELOAD", "False") == "True"
+
 
 # Application definition
 

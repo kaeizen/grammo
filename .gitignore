@@ -23,6 +23,7 @@ dist-ssr
 *.sln
 *.sw?
 
-*.env
+.env
+.env.production
 
 __pycache__

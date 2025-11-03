@@ -1,16 +1,25 @@
-import { useEffect, useState, useRef, type FormEvent } from "react";
+
+import type { Message } from "./types";
+import { useState, useRef, type FormEvent } from "react";
+import { useLocalStorage, useEndChat,
+	useFormHeight, useSendChat } from "./hooks";
+
 import Cog from "./assets/cog.svg";
 import Send from "./assets/send.svg";
+import Clean from './assets/clean.svg'
+
 import Dropdown from "./components/Dropdown";
 import { Chat } from "./components/Chat";
-import type { Message } from "./types";
-import { useLocalStorage, useEndChat } from "./hooks";
+import { Tooltip } from "./components/Tooltip";
 
 function App() {
-	const [showOptions, setShowOptions] = useState(false);
 	const [ mode, setMode ] = useLocalStorage('gm_mode', 'Default')
 	const [ tone, setTone ] = useLocalStorage( 'gm_tone', 'Default')
-	const [messageToSend, setMessageToSend] = useState("");
+
+	const [ showOptions, setShowOptions ] = useState(false);
+	const [ messageToSend, setMessageToSend ] = useState("");
+	const [ hasActiveSession, setHasActiveSession ] = useState(false);
+	const [ chatSession, setChatSession ] = useState(0);
 
 	const [messages, setMessages] = useState<Message[]>([]);
 	const [isRetrieving, setIsRetrieving] = useState(false);
@@ -18,78 +27,40 @@ function App() {
 	const formRef = useRef<HTMLFormElement>(null);
 	const optionsRef = useRef<HTMLDivElement>(null);
 
+	useFormHeight(formRef, optionsRef, showOptions);
+	useEndChat(hasActiveSession);
+	const error = useSendChat(isRetrieving, chatSession,
+		mode, tone, messageToSend, setMessageToSend,
+		setMessages, setIsRetrieving
+	);
+
 	const handleToggleOptions = () => {
 		setShowOptions( prev => ! prev )
 	};
 
-	useEffect(() => {
-		const updateFormHeight = () => {
-			if (formRef.current && optionsRef.current) {
-				const formHeight = formRef.current.offsetHeight;
-				optionsRef.current.style.setProperty('--form-height', `${-formHeight}px`);
-			}
-		};
-
-		updateFormHeight();
-
-		// Update on window resize
-		window.addEventListener('resize', updateFormHeight);
-
-		// Update when options visibility changes
-		if (showOptions) {
-			// Small delay to ensure form is rendered
-			setTimeout(updateFormHeight, 0);
-		}
-
-		return () => {
-			window.removeEventListener('resize', updateFormHeight);
-		};
-	}, [showOptions]);
-
 	const onSubmit = (e: FormEvent) => {
 		e.preventDefault();
 		setIsRetrieving(true);
+
+		if ( ! hasActiveSession ) {
+			setHasActiveSession(true);
+		}
 	};
 
-	useEffect(() => {
-		const retrieveResponse = async () => {
-			const message = messageToSend;
-			setMessageToSend("");
-			setMessages((prev) => [
-				...prev,
-				{ role: "user", content: message },
-			]);
-			try {
-				const response = await fetch("api/v1/chat/",
-					{
-						method: "POST",
-						credentials: "include",
-						headers: { "Content-Type": "application/json" },
-						body: JSON.stringify({ message: message }),
-					}
-				);
-				const jsonres = await response.json();
-				console.log("json", jsonres);
-
-				if (jsonres.status === "success" && jsonres.response) {
-					setMessages((prev) => [
-						...prev,
-						{ role: "assistant", content: jsonres.response },
-					]);
-				}
-			} catch (error) {
-				console.error("Error retrieving response:", error);
-			} finally {
-				setIsRetrieving(false);
-			}
-		};
-
-		if (isRetrieving) {
-			retrieveResponse();
-		}
-	}, [isRetrieving]);
-
-	useEndChat(messages);
+	const resetChat = () => {
+		fetch("api/v1/end/", {
+			method: "POST",
+			credentials: "include",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({}),
+		}).catch(() => {
+			// Silently handle errors - end chat is a cleanup operation
+			// Don't log error details to avoid exposing sensitive information
+		});
+		setHasActiveSession(false);
+		setMessages([]);
+		setChatSession(prev => prev + 1);
+	}
 
 	return (
 		<>
@@ -107,7 +78,14 @@ function App() {
 				</div>
 
 				{/* Chats */}
-				<div className="chats"><Chat messages={messages} /></div>
+				<div className="chats">
+					<div><Chat messages={messages} /></div>
+					{error && (
+						<div className="error-message">
+							<p>{error.message}</p>
+						</div>
+					)}
+				</div>
 
 				{/* Footer */}
 				<div className="footer">
@@ -117,9 +95,8 @@ function App() {
 								label="Mode"
 								value={mode}
 								options={[
-									{ value: "Default", label: "Default" },
-									{ value: "Translation", label: "Translation" },
-									{ value: "Grammar", label: "Grammar" },
+									{ value: "default", label: "Default" },
+									{ value: "grammar", label: "Grammar" },
 								]}
 								onChange={setMode}
 							/>
@@ -127,10 +104,9 @@ function App() {
 								label="Tone"
 								value={tone}
 								options={[
-									{ value: "Default", label: "Default" },
-									{ value: "Formal", label: "Formal" },
-									{ value: "Informal", label: "Informal" },
-									{ value: "Casual", label: "Casual" },
+									{ value: "default", label: "Default" },
+									{ value: "formal", label: "Formal" },
+									{ value: "casual", label: "Casual" },
 								]}
 								onChange={setTone}
 							/>
@@ -145,17 +121,29 @@ function App() {
 							onChange={(e) => setMessageToSend(e.target.value)}
 						/>
 						<div className="button-row">
-							<button
-								className="cog-button"
-								type="button"
-								onClick={handleToggleOptions}
-								aria-label="Toggle options"
-							>
-								<img src={Cog} alt="Settings" />
-							</button>
+							<Tooltip text="Options" position="top">
+								<button
+									className="cog-button button"
+									type="button"
+									onClick={handleToggleOptions}
+									aria-label="Toggle options"
+								>
+									<img src={Cog} alt="Settings" />
+								</button>
+							</Tooltip>
+							<Tooltip text="Clear chat" position="top">
+								<button
+									className="reset-button button"
+									type="button"
+									onClick={resetChat}
+									aria-label="Reset Chat"
+								>
+									<img src={Clean} alt="Clear" />
+								</button>
+							</Tooltip>
 							<button
 								type="submit"
-								disabled={!messageToSend.trim() || isRetrieving}
+								disabled={!messageToSend.trim() || isRetrieving || error !== null }
 							>
 								<img
 									src={Send}
