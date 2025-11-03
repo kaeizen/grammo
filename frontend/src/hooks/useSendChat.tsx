@@ -26,6 +26,7 @@ export const useSendChat = (
 	}, [chatSession]);
 
 	useEffect(() => {
+		console.log('API', API_ENDPOINT);
 		// Only proceed if we're retrieving and there's a message to send
 		if (!isRetrieving || !messageToSend.trim()) {
 			return;
