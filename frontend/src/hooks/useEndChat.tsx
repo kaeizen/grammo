@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { API_ENDPOINT } from "../utils";
 /**
  * Detects if the application is running as an installed PWA
  * Checks for standalone display mode and iOS Safari standalone mode
@@ -28,12 +29,12 @@ const isPWAInstalled = (): boolean => {
 const endChat = () => {
 	// Use sendBeacon for guaranteed sending before unload
 	if (navigator.sendBeacon) {
-		const url = "api/v1/end/";
+		const url = `${API_ENDPOINT}/api/v1/end/`;
 		const data = JSON.stringify({});
 		navigator.sendBeacon(url, data);
 	} else {
 		// Fallback to fetch (not guaranteed)
-		fetch("api/v1/end/", {
+		fetch(`${API_ENDPOINT}/api/v1/end/`, {
 			method: "POST",
 			credentials: "include",
 			headers: { "Content-Type": "application/json" },

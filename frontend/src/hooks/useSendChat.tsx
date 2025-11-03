@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import type { Message } from "../types";
 import { getErrorMessage } from "../utils/errors";
-
+import { API_ENDPOINT } from "../utils";
 interface ErrorState {
 	message: string;
 	type: "network" | "server" | "unknown";
@@ -49,7 +49,7 @@ export const useSendChat = (
 		setError(null); // Clear any previous errors
 
 		// Send message to server
-		fetch("api/v1/chat/", {
+		fetch(`${API_ENDPOINT}/api/v1/chat/`, {
 			method: "POST",
 			credentials: "include",
 			headers: { "Content-Type": "application/json" },

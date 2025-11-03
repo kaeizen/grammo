@@ -3,6 +3,7 @@ import type { Message } from "./types";
 import { useState, useRef, type FormEvent } from "react";
 import { useLocalStorage, useEndChat,
 	useFormHeight, useSendChat } from "./hooks";
+import { API_ENDPOINT } from "./utils";
 
 import Cog from "./assets/cog.svg";
 import Send from "./assets/send.svg";
@@ -11,6 +12,7 @@ import Clean from './assets/clean.svg'
 import Dropdown from "./components/Dropdown";
 import { Chat } from "./components/Chat";
 import { Tooltip } from "./components/Tooltip";
+
 
 function App() {
 	const [ mode, setMode ] = useLocalStorage('gm_mode', 'Default')
@@ -52,7 +54,7 @@ function App() {
 	};
 
 	const resetChat = () => {
-		fetch("api/v1/end/", {
+		fetch(`${API_ENDPOINT}/api/v1/end/`, {
 			method: "POST",
 			credentials: "include",
 			headers: { "Content-Type": "application/json" },
