@@ -39,9 +39,23 @@ Grammo is a full-stack web application that provides AI-powered translation and 
 
 ### 1. Clone the repository
 
+**Important:** This repository uses Git submodules. Clone with the `--recursive` flag to automatically initialize submodules:
+
 ```bash
-git clone <repository-url>
+git clone --recursive <repository-url>
 cd grammo
+```
+
+**If you already cloned without `--recursive`**, initialize and update submodules:
+
+```bash
+git submodule update --init --recursive
+```
+
+**To update submodules to their latest commits:**
+
+```bash
+git submodule update --remote
 ```
 
 ### 2. Backend Setup
@@ -213,16 +227,41 @@ End the current chat session and clear conversation history.
 }
 ```
 
+## Git Submodules
+
+This repository uses Git submodules for the backend component. The `backend` directory is a separate repository that tracks its own version history.
+
+### Working with Submodules
+
+**Initial Setup:**
+- Always clone with `--recursive` to get submodules automatically
+- Or run `git submodule update --init --recursive` after cloning
+
+**Updating Submodules:**
+- Update all submodules to their latest commits: `git submodule update --remote`
+- Update submodules to the commit specified in the parent repo: `git submodule update`
+
+**Switching Branches:**
+- After switching branches that change submodule commits, run: `git submodule update --init --recursive`
+
+**Making Changes to Submodules:**
+- Navigate into the submodule directory (e.g., `cd backend`)
+- Make your changes and commit them in the submodule repository
+- Go back to the parent repository and commit the submodule reference update
+
+For more information, see [Git Submodules Documentation](https://git-scm.com/book/en/v2/Git-Tools-Submodules).
+
 ## Project Structure
 
 ```
 grammo/
-├── backend/
+├── backend/                # Git submodule - Django backend API
 │   ├── agent_manager/      # AI agent management and LangChain integration
 │   ├── api/                # Django REST API views and URLs
 │   ├── backend/            # Django project settings
 │   ├── manage.py
-│   └── requirements.txt
+│   ├── requirements.txt
+│   └── README.md           # See backend/README.md for backend-specific docs
 ├── frontend/
 │   ├── src/
 │   │   ├── components/     # React components (Chat, Dropdown)
@@ -231,7 +270,8 @@ grammo/
 │   │   └── App.tsx         # Main application component
 │   ├── public/             # Static assets and PWA files
 │   └── package.json
-└── README.md
+├── .gitmodules             # Git submodule configuration
+└── README.md               # This file
 ```
 
 ## Development
